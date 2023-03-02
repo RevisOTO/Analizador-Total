@@ -43,12 +43,13 @@
             this.label6 = new System.Windows.Forms.Label();
             this.txtLinea = new System.Windows.Forms.TextBox();
             this.btnValidate = new System.Windows.Forms.Button();
+            this.btnAbrir = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dtgVariables)).BeginInit();
             this.SuspendLayout();
             // 
             // btnAnalizar
             // 
-            this.btnAnalizar.Location = new System.Drawing.Point(512, 404);
+            this.btnAnalizar.Location = new System.Drawing.Point(529, 516);
             this.btnAnalizar.Margin = new System.Windows.Forms.Padding(4);
             this.btnAnalizar.Name = "btnAnalizar";
             this.btnAnalizar.Size = new System.Drawing.Size(112, 28);
@@ -62,7 +63,7 @@
             this.rtxtCodigo.Location = new System.Drawing.Point(44, 49);
             this.rtxtCodigo.Margin = new System.Windows.Forms.Padding(4);
             this.rtxtCodigo.Name = "rtxtCodigo";
-            this.rtxtCodigo.Size = new System.Drawing.Size(345, 332);
+            this.rtxtCodigo.Size = new System.Drawing.Size(345, 413);
             this.rtxtCodigo.TabIndex = 1;
             this.rtxtCodigo.Text = "";
             this.rtxtCodigo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.onEnter);
@@ -74,10 +75,10 @@
             this.Tipo,
             this.ID,
             this.CONT});
-            this.dtgVariables.Location = new System.Drawing.Point(748, 187);
+            this.dtgVariables.Location = new System.Drawing.Point(1011, 187);
             this.dtgVariables.Name = "dtgVariables";
             this.dtgVariables.RowHeadersWidth = 51;
-            this.dtgVariables.Size = new System.Drawing.Size(429, 195);
+            this.dtgVariables.Size = new System.Drawing.Size(429, 275);
             this.dtgVariables.TabIndex = 3;
             // 
             // Tipo
@@ -109,7 +110,7 @@
             this.richTextBox1.Enabled = false;
             this.richTextBox1.Location = new System.Drawing.Point(13, 49);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(24, 332);
+            this.richTextBox1.Size = new System.Drawing.Size(24, 413);
             this.richTextBox1.TabIndex = 4;
             this.richTextBox1.Text = "";
             // 
@@ -125,7 +126,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(540, 29);
+            this.label3.Location = new System.Drawing.Point(672, 30);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(52, 16);
             this.label3.TabIndex = 6;
@@ -136,14 +137,14 @@
             this.rtxtLexico.Enabled = false;
             this.rtxtLexico.Location = new System.Drawing.Point(396, 49);
             this.rtxtLexico.Name = "rtxtLexico";
-            this.rtxtLexico.Size = new System.Drawing.Size(346, 333);
+            this.rtxtLexico.Size = new System.Drawing.Size(595, 413);
             this.rtxtLexico.TabIndex = 7;
             this.rtxtLexico.Text = "";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(942, 29);
+            this.label4.Location = new System.Drawing.Point(1191, 18);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(75, 16);
             this.label4.TabIndex = 8;
@@ -152,7 +153,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(914, 159);
+            this.label5.Location = new System.Drawing.Point(1191, 158);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(80, 16);
             this.label5.TabIndex = 9;
@@ -161,7 +162,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(748, 81);
+            this.label6.Location = new System.Drawing.Point(997, 70);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(49, 16);
             this.label6.TabIndex = 10;
@@ -170,7 +171,7 @@
             // txtLinea
             // 
             this.txtLinea.Enabled = false;
-            this.txtLinea.Location = new System.Drawing.Point(803, 78);
+            this.txtLinea.Location = new System.Drawing.Point(1052, 67);
             this.txtLinea.Name = "txtLinea";
             this.txtLinea.Size = new System.Drawing.Size(374, 22);
             this.txtLinea.TabIndex = 11;
@@ -180,17 +181,28 @@
             this.btnValidate.BackColor = System.Drawing.Color.Red;
             this.btnValidate.Enabled = false;
             this.btnValidate.ForeColor = System.Drawing.Color.SeaShell;
-            this.btnValidate.Location = new System.Drawing.Point(902, 106);
+            this.btnValidate.Location = new System.Drawing.Point(1151, 95);
             this.btnValidate.Name = "btnValidate";
             this.btnValidate.Size = new System.Drawing.Size(158, 23);
             this.btnValidate.TabIndex = 12;
             this.btnValidate.UseVisualStyleBackColor = false;
             // 
+            // btnAbrir
+            // 
+            this.btnAbrir.Location = new System.Drawing.Point(157, 470);
+            this.btnAbrir.Name = "btnAbrir";
+            this.btnAbrir.Size = new System.Drawing.Size(75, 23);
+            this.btnAbrir.TabIndex = 13;
+            this.btnAbrir.Text = "Abrir";
+            this.btnAbrir.UseVisualStyleBackColor = true;
+            this.btnAbrir.Click += new System.EventHandler(this.btnAbrir_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1185, 445);
+            this.ClientSize = new System.Drawing.Size(1505, 557);
+            this.Controls.Add(this.btnAbrir);
             this.Controls.Add(this.btnValidate);
             this.Controls.Add(this.txtLinea);
             this.Controls.Add(this.label6);
@@ -231,6 +243,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox txtLinea;
         private System.Windows.Forms.Button btnValidate;
+        private System.Windows.Forms.Button btnAbrir;
     }
 }
 

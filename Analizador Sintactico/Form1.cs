@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -24,12 +25,11 @@ namespace Analizador_Sintactico
             //Palabras reservadas
             PalabrasReservadas.Add(new Tuple<string, string>("readline", "PR01"));
             PalabrasReservadas.Add(new Tuple<string, string>("println", "PR02"));
-            //Tipos de datos
             PalabrasReservadas.Add(new Tuple<string, string>("string", "PR03"));
             PalabrasReservadas.Add(new Tuple<string, string>("int", "PR04"));
             PalabrasReservadas.Add(new Tuple<string, string>("bool", "PR05"));
             PalabrasReservadas.Add(new Tuple<string, string>("double", "PR06"));
-            PalabrasReservadas.Add(new Tuple<string, string>("const", "PR07"));
+            PalabrasReservadas.Add(new Tuple<string, string>("continue", "PR07"));
             PalabrasReservadas.Add(new Tuple<string, string>("char", "PR15"));
 
             //If y Loops
@@ -40,18 +40,18 @@ namespace Analizador_Sintactico
             PalabrasReservadas.Add(new Tuple<string, string>("else", "PR12"));
 
             //Otros
-            PalabrasReservadas.Add(new Tuple<string, string>("inicio", "PR13"));
-            PalabrasReservadas.Add(new Tuple<string, string>("final", "PR14"));
+            PalabrasReservadas.Add(new Tuple<string, string>("begin", "PR13"));
+            PalabrasReservadas.Add(new Tuple<string, string>("end", "PR14"));
 
             //Identificadores
             PalabrasReservadas.Add(new Tuple<string, string>("iden", "IDEN"));
 
             //Operadores
-            PalabrasReservadas.Add(new Tuple<string, string>("+", "OPER01"));
-            PalabrasReservadas.Add(new Tuple<string, string>("-", "OPER02"));
-            PalabrasReservadas.Add(new Tuple<string, string>("/", "OPER03"));
-            PalabrasReservadas.Add(new Tuple<string, string>("*", "OPER04"));
-            PalabrasReservadas.Add(new Tuple<string, string>("^", "OPER05"));
+            PalabrasReservadas.Add(new Tuple<string, string>("+", "OPER1"));
+            PalabrasReservadas.Add(new Tuple<string, string>("-", "OPER2"));
+            PalabrasReservadas.Add(new Tuple<string, string>("/", "OPER3"));
+            PalabrasReservadas.Add(new Tuple<string, string>("*", "OPER4"));
+            PalabrasReservadas.Add(new Tuple<string, string>("^", "OPER5"));
 
             //Operadores Relacionales
             PalabrasReservadas.Add(new Tuple<string, string>(">", "COMP01"));
@@ -75,46 +75,145 @@ namespace Analizador_Sintactico
             PalabrasReservadas.Add(new Tuple<string, string>("{", "CE06"));
             PalabrasReservadas.Add(new Tuple<string, string>("}", "CE07"));
 
-            //Asignacion
             PalabrasReservadas.Add(new Tuple<string, string>("=", "ASIGN01"));
 
-            //Cometario y Letrero
+            //Cometario
             PalabrasReservadas.Add(new Tuple<string, string>("Comentario", "COM"));
-            PalabrasReservadas.Add(new Tuple<string, string>("Letrero", "LET"));
         }
         int linea;
         bool OPA = false;
         String[] type = { "int", "string", "bool", "char", "double" };
-        String[] CE = { "+", "-", "/", "*" };
+        String[] CE = { "+", "-", "/", "*", "^", "(","=" };
+        String[] COMP = { "==", ">", "<","<>","<=",">="};
+        String[] LOG = { "!", "||", "&&"};
+        String[] ANI = { "if", "for", "do","while" };
+
+        List<Tuple<string, string>> IDES= new List<Tuple<string, string>>();
         private void Lexico()
         {
+            IDES.Clear();
             rtxtLexico.Clear();
             string lastWord = "";
             int ide = 0;
-            int cont = 0;
+            string PR = "";
+            int countWord = -1;
             foreach (var line in rtxtCodigo.Lines)
             {
+                if (line == "")
+                {
+                    continue;
+                }
+                else if (line[0] == '/')
+                {
+                    rtxtLexico.AppendText("COM");
+                    continue;
+                }
                 foreach (var word in line.Split())
                 {
-
-                    if (PalabrasReservadas.Any(m => m.Item1 == word))
+                    countWord++;
+                    //Reasignacion
+                    if (IDES.Any(m => m.Item1 == word))
                     {
-                        string PR = PalabrasReservadas.FirstOrDefault(m => m.Item1 == word).Item2;
-                        rtxtLexico.AppendText(PR + " ");
+                        string find = IDES.FirstOrDefault(m => m.Item1 == word).Item2;
+                        if (word != line.Split()[line.Split().Length - 1])
+                        {
+                            rtxtLexico.AppendText(find + " ");
+                        }
+                        else
+                        {
+                            rtxtLexico.AppendText(find);
+                        }
+                    }
+                    //Asignacion
+                    else if (PalabrasReservadas.Any(m => m.Item1 == word))
+                    {
+                        PR = PalabrasReservadas.FirstOrDefault(m => m.Item1 == word).Item2;
+                        if (PR != line.Split()[line.Split().Length - 1])
+                        {
+                            rtxtLexico.AppendText(PR + " ");
+                        }
+                        else
+                        {
+                            rtxtLexico.AppendText(PR);
+                        }
                     }
                     else
                     {
                         //Identificadores
                         if (Array.Exists(type, element => element == lastWord))
                         {
-                            ide++;
-                            rtxtLexico.AppendText("IDEN"+ide+" ");
+                            if (!char.IsLetter(word[0]))
+                            {
+                                if (word != line.Split()[line.Split().Length - 1])
+                                {
+                                    rtxtLexico.AppendText("Error ");
+                                }
+                                else
+                                {
+                                    rtxtLexico.AppendText("Error");
+                                }
+                            }
+                            else
+                            {
+                                ide++;
+                                rtxtLexico.AppendText("IDEN" + ide + " ");
+                                continue;
+                            }
                         }
-                        else if(lastWord == "=")
+                        if (lastWord == "=")
+                        {
+                            IDES.Add(new Tuple<string, string>(line.Split()[countWord-2], "IDEN" + ide));
+                        }
+                        if (Array.Exists(CE, element => element == lastWord) || Array.Exists(COMP, element => element == lastWord))
                         {
 
-                            cont++;
-                            rtxtLexico.AppendText("CONT" + cont);
+                            if (word != line.Split()[line.Split().Length - 1])
+                            {
+                                if (Semantica("int",word,false) == "int")
+                                {
+                                    rtxtLexico.AppendText("CNE ");
+                                }
+                                else if (Semantica("double", word, false) == "double")
+                                {
+                                    rtxtLexico.AppendText("CNR ");
+                                }
+                                else if (Semantica("char", word, false) == "char")
+                                {
+                                    rtxtLexico.AppendText("CHAR ");
+                                }
+                                else if (Semantica("bool", word, false) == "bool")
+                                {
+                                    rtxtLexico.AppendText("BOOL ");
+                                }
+                                else
+                                {
+                                    rtxtLexico.AppendText("STR ");
+                                }
+
+                            }
+                            else
+                            {
+                                if (Semantica("int", word,false) == "int")
+                                {
+                                    rtxtLexico.AppendText("CNE");
+                                }
+                                else if (Semantica("double", word, false) == "double")
+                                {
+                                    rtxtLexico.AppendText("CNR");
+                                }
+                                else if (Semantica("char", word, false) == "char")
+                                {
+                                    rtxtLexico.AppendText("CHAR");
+                                }
+                                else if (Semantica("bool", word, false) == "bool")
+                                {
+                                    rtxtLexico.AppendText("BOOL");
+                                }
+                                else
+                                {
+                                    rtxtLexico.AppendText("STR");
+                                }
+                            }
                         }
                         else
                         {
@@ -130,7 +229,8 @@ namespace Analizador_Sintactico
                     }
                     lastWord = word;
                 }
-                if (line != rtxtCodigo.Lines[rtxtCodigo.Lines.Length-1])
+                countWord = -1;
+                if (line != rtxtCodigo.Lines[rtxtCodigo.Lines.Length-1] || line.Length == 1)
                 {
                     rtxtLexico.AppendText("\n");
                 }
@@ -141,31 +241,55 @@ namespace Analizador_Sintactico
         {
             foreach (var line in rtxtLexico.Lines)
             {
-                String[] sintacticCodes = { "PIAC", "IAC", "bool", "char", "double" };
+                String[] sintacticCodes = { "PICC", "ICC", "PCICIC", "PCCCCC", "PCCCIC", "PCICCC", "PCCC", "PCIC", "PCPI" };
 
                 string codigoCurrent = "";
                 foreach (var word in line.Split())
                 {
-                    codigoCurrent+= word[0];
+                    if (word != "")
+                    {
+                        codigoCurrent += word[0];
+                    }
                 }
                 //Asignacion
-                if (Array.Exists(sintacticCodes, element => element == codigoCurrent && codigoCurrent == "PIAC"))
+                if (codigoCurrent == "PIAC")
                 {
                     txtLinea.Text = line;
                     btnValidate.BackColor= Color.Green;
                     btnValidate.Text = "Asignacion";
                 }
                 //Reasignacion
-                else if (Array.Exists(sintacticCodes, element => element == codigoCurrent && codigoCurrent == "IAC"))
+                else if (codigoCurrent == "IAC")
                 {
                     txtLinea.Text = line;
                     btnValidate.BackColor = Color.Green;
                     btnValidate.Text = "Reasignacion";
                 }
+                //Condicional
+                else if (codigoCurrent == "PCICIC" || codigoCurrent == "PCCCCC" || codigoCurrent == "PCICCC" || codigoCurrent == "PCCCIC")
+                {
+                    txtLinea.Text = line;
+                    btnValidate.BackColor = Color.Green;
+                    btnValidate.Text = "Condicion";
+                }
+                //Ciclo For
+                else if (codigoCurrent == "PCPIACICCIOOC")
+                {
+                    txtLinea.Text = line;
+                    btnValidate.BackColor = Color.Green;
+                    btnValidate.Text = "Ciclo For";
+                }
+                //WriteLine y ReadLine
+                else if (codigoCurrent == "PCCC" || codigoCurrent == "PCIC")
+                {
+                    txtLinea.Text = line;
+                    btnValidate.BackColor = Color.Green;
+                    btnValidate.Text = "Impresion";
+                }
             }
         }
 
-        private string Semantica(string tipo, string valor)
+        private string Semantica(string tipo, string valor, bool showError)
         {
             // Verificar tipo de dato
             switch (tipo)
@@ -174,7 +298,8 @@ namespace Analizador_Sintactico
                     int numero;
                     if (!int.TryParse(valor, out numero))
                     {
-                        MessageBox.Show("Error linea " + linea + ": el valor asignado no es un numérico entero");
+                        if (showError)
+                            MessageBox.Show("Error linea " + linea + ": el valor asignado no es un numérico entero");
                         
                         return "false";
                     }
@@ -183,7 +308,8 @@ namespace Analizador_Sintactico
                     double numerod;
                     if (!double.TryParse(valor, out numerod))
                     {
-                        MessageBox.Show("Error linea " + linea + "el valor asignado no es un numérico real");
+                        if (showError)
+                            MessageBox.Show("Error linea " + linea + "el valor asignado no es un numérico real");
                         
                         return "false";
                     }
@@ -191,22 +317,31 @@ namespace Analizador_Sintactico
                 case "bool":
                     if (!(valor.ToLower() == "true" || valor.ToLower() == "false"))
                     {
-                        MessageBox.Show("Error linea " + linea + " el valor asignado no es booleano");
+                        if (showError)
+                            MessageBox.Show("Error linea " + linea + " el valor asignado no es booleano");
                         return "false";
                     }
                     return "bool";
                 case "char":
                     char caracter;
-                    if ( valor.Length < 3 || (!char.TryParse(valor[1].ToString(), out caracter) && !(valor[0] == '\'' && valor[valor.Length - 1] == '\'')))
+                    if (valor.Length > 3)
                     {
-                        MessageBox.Show("Error linea " + linea + " el valor asignado no es un caracter");
+                        if (showError)
+                            MessageBox.Show("Error linea " + linea + " el valor asignado no es un caracter");
+                        return "false";
+                    }
+                    if ((!char.TryParse(valor[1].ToString(), out caracter) && !(valor[0] == '\'' || valor[valor.Length - 1] == '\'')))
+                    {
+                        if (showError)
+                            MessageBox.Show("Error linea " + linea + " el valor asignado no es un caracter");
                         return "false";
                     }
                     return "char";
                 case "string":
                     if (!(valor[0] == '\"' && valor[valor.Length - 1] == '\"'))
                     {
-                        MessageBox.Show("Error linea " + linea + " el valor asignado no es una cadena");
+                        if (showError)
+                            MessageBox.Show("Error linea " + linea + " el valor asignado no es una cadena");
                         return "false";
                     }
                     return "string";
@@ -240,10 +375,11 @@ namespace Analizador_Sintactico
             return "false";
         }
 
- 
 
+        int terPas = 0;
         private void button1_Click(object sender, EventArgs e)
         {
+            string lastLine = "";
             dtgVariables.Rows.Clear();
             if (rtxtCodigo.Lines.Length == 0)
             {
@@ -252,31 +388,279 @@ namespace Analizador_Sintactico
 
             //Analizador Lexico
             Lexico();
-            //Analizador
+            //Analizador Sintactico
             Sintactico();
             foreach (string input in rtxtCodigo.Lines)
             {
+                if (input == "" || input[0] == '/')
+                {
+                    continue;
+                }
+                //Tercera pasada
+                if (input == "{") {
+                    if (!Array.Exists(ANI, m => m == lastLine.Split()[0]))
+                    {
+                        MessageBox.Show("Apertura de instruccion anidada innecesaria");
+                        continue;
+                    }
+                    else
+                    {
+                        lastLine = input;
+                        terPas++;
+                        continue;
+                    } 
+                }
+                else if (input == "}") {
+                    if (terPas == 0 || terPas % 2 == 0)
+                    {
+                        MessageBox.Show("Terminacion de instruccion anidada innecesaria");
+                        continue;
+                    }
+                    else
+                    {
+                        lastLine = input;
+                        terPas--;
+                        continue;
+                    }
+                }
+                lastLine = input;
+                OPA = false;
                 linea++;
                 string[] tokens = input.Split(' ');
                 string oa = "";
-                string valor2;
-                // Verificar si la asignacion contiene cuatro elementos
-                if (tokens.Length != 4 && tokens.Length != 6 && tokens.Length != 3)
+                string valor2 = "";
+                string valor = "";
+                int resultado = 0;
+
+                // Verificar si la asignacion esta bien
+                if (tokens.Length != 4 && tokens.Length != 6 && tokens.Length != 3 && tokens.Length != 5 && !Array.Exists(ANI, element => element == tokens[0]))
                 {
                     MessageBox.Show("Error linea " + linea + ": instrucción mal formada");
                     linea = 0;
-                    return;
-                }
-                else if (tokens.Length == 6)
-                {
-                    OPA = true;
-                    oa = tokens[4];
-                    valor2 = tokens[5];
+                    continue;
                 }
                 string tipo = tokens[0].ToLower();
-                string variable = tokens[1];
-                string operador = tokens[2];
-                string valor = "";
+                string variable = "";
+                string operador = "";
+                if (tokens.Length >= 2)
+                {
+                    variable = tokens[1];
+                    operador = tokens[2];
+                }
+                //Si es una instruccion aninada
+                if (Array.Exists(ANI, element => element == tipo))
+                {
+                    if ("if" == tipo)
+                    {
+                        if (tokens[1] == "(" && tokens[5] == ")")
+                        {
+                            valor = tokens[2];
+                            valor2 = tokens[4];
+                            if (Array.Exists(LOG, element => element == tokens[3]))
+                            {
+                                if (Semantica("bool", valor, false) == "false" || Semantica("bool", valor2, false) == "false")
+                                {
+                                    MessageBox.Show("Los operadores logicos solo funcionan con booleanos");
+                                    continue;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            else if (Array.Exists(COMP, element => element == tokens[3]))
+                            {
+                                if (CheckVar(valor, "CONT") != "false")
+                                {
+                                    valor = CheckVar(valor, "CONT");
+                                }
+                                if (CheckVar(valor2, "CONT") != "false")
+                                {
+                                    valor2 = CheckVar(valor2, "CONT");
+                                }
+                                if (valor[0] == '\"' && Semantica("string", valor2, true) == "string")
+                                {
+                                    continue;
+                                }
+                                else if (valor[0] == '\'' && Semantica("char", valor2, true) == "char")
+                                {
+                                    continue;
+                                }
+                                else if (Semantica("int", valor, true) == "false" && Semantica("int", valor2, true) == "false")
+                                {
+                                    continue;
+                                }
+                                else if (Semantica("int", valor, true) == "int" && Semantica("int", valor2, true) == "int")
+                                {
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Condicional mal formada");
+                            }
+
+                        }
+                        else
+                        {
+                            MessageBox.Show("Condicional mal formada");
+                        }
+                    }
+                    if ("for" == tipo)
+                    {
+                        if (!char.IsLetter(tokens[3][0]))
+                        {
+                            MessageBox.Show("Variable de Ciclo For mal formada");
+                        }
+                        else if (tokens[1] == "(" && tokens[2] == "int" && tokens[4] == "=" && Semantica("int", tokens[5], true) == "int" && tokens[9] == tokens[3] && tokens[10] == "+" && tokens[11] == "+" && tokens[12] == ")")
+                        {
+                            valor = tokens[6];
+                            valor2 = tokens[8];
+                            if (Array.Exists(LOG, m => m == tokens[7]))
+                            {
+                                if (Semantica("bool",valor,false) == "false" || Semantica("bool", valor2, false) == "false")
+                                {
+                                    MessageBox.Show("Los operadores logicos solo funcionan con booleanos");
+                                    continue;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            else if (Array.Exists(COMP, m => m == tokens[7]))
+                            {
+                                dtgVariables.Rows.Add("int", tokens[3], tokens[5]);
+                                if (CheckVar(valor, "CONT") != "false")
+                                {
+                                    valor = CheckVar(valor, "CONT");
+                                }
+                                else if (CheckVar(valor2, "CONT") != "false")
+                                {
+                                    valor2 = CheckVar(valor2, "CONT");
+                                }
+                                if (valor[0] == '\"' && Semantica("string", valor2, true) == "string")
+                                {
+                                    continue;
+                                }
+                                else if (valor[0] == '\'' && Semantica("char", valor2, true) == "char")
+                                {
+                                    continue;
+                                }
+                                else if (Semantica("int", valor, true) == "false" && Semantica("int", valor2, true) == "false")
+                                {
+                                    continue;
+                                }
+                                else if (Semantica("int", valor, true) == "int" && Semantica("int", valor2, true) == "int")
+                                {
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Ciclo For mal formado");
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Ciclo For mal formado");
+                        }
+                        continue;
+                    }
+                    if ("while" == tipo)
+                    {
+                        if (tokens[1] == "(" && tokens[5] == ")")
+                        {
+                            valor = tokens[2];
+                            valor2 = tokens[4];
+                            if (Array.Exists(LOG, m => m == tokens[3]))
+                            {
+                                if (Semantica("bool", valor, false) == "false" || Semantica("bool", valor2, false) == "false")
+                                {
+                                    MessageBox.Show("Los operadores logicos solo funcionan con booleanos");
+                                    continue;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            else if (Array.Exists(COMP, m => m == tokens[3]))
+                            {
+
+                                if (CheckVar(valor, "CONT") != "false")
+                                {
+                                    valor = CheckVar(valor, "CONT");
+                                }
+                                else if (CheckVar(valor2, "CONT") != "false")
+                                {
+                                    valor2 = CheckVar(valor2, "CONT");
+                                }
+                                if (valor[0] == '\"' && Semantica("string", valor2, true) == "string")
+                                {
+                                    continue;
+                                }
+                                else if (valor[0] == '\'' && Semantica("char", valor2, true) == "char")
+                                {
+                                    continue;
+                                }
+                                else if (Semantica("int", valor, true) == "false" && Semantica("int", valor2, true) == "false")
+                                {
+                                    continue;
+                                }
+                                else if (Semantica("int", valor, true) == "int" && Semantica("int", valor2, true) == "int")
+                                {
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Ciclo While mal formado");
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Ciclo While mal formado");
+                        }
+                        continue;
+                    }
+                    if ("do" == tipo)
+                    {
+                        continue;
+                    }
+                }
+
+                //Operacion de asignacion
+                if (tokens.Length == 6)
+                {
+                    OPA = true;
+                        valor = tokens[3];
+                        oa = tokens[4];
+                        valor2 = tokens[5];
+                }
+                //Operacion de reasignacion
+                else if (tokens.Length == 5)
+                {
+                    
+                    valor = tokens[2];
+                    oa = tokens[3];
+                    valor2 = tokens[4];
+                    if (doOPA(valor, valor2, oa, CheckVar(tipo, "Tipo")) == "false")
+                    {
+                        continue;
+                    }
+                    resultado = int.Parse(doOPA(valor, valor2, oa, CheckVar(tipo,"Tipo")));
+                    foreach (DataGridViewRow Row in dtgVariables.Rows)
+                    {
+                        if (Convert.ToString(Row.Cells["ID"].Value) == CheckVar(tipo,"ID"))
+                        {
+                            Row.Cells["CONT"].Value = resultado;
+                            break;
+                        }
+                    }
+                    continue;
+                }
+
                 if (tokens.Length >= 4)
                 {
                     valor = tokens[3];
@@ -296,12 +680,12 @@ namespace Analizador_Sintactico
                     }
                     else if (CheckVar(tokens[2], "CONT") == "false")
                     {
-                        if (Semantica(CheckVar(tokens[0], "Tipo"), tokens[2]) == "false")
+                        if (Semantica(CheckVar(tokens[0], "Tipo"), tokens[2],true) == "false")
                         {
                             continue;
                         }
                     }
-                    else if (Semantica(CheckVar(tokens[0], "Tipo"), CheckVar(tokens[2], "CONT")) == "false")
+                    else if (Semantica(CheckVar(tokens[0], "Tipo"), CheckVar(tokens[2], "CONT"),true) == "false")
                     {
                         continue;
                     }
@@ -327,9 +711,7 @@ namespace Analizador_Sintactico
                             break;
                         }
                     }
-
                     continue;
-
                 }
 
                 //Si no es una reasignacion es una declaracion
@@ -368,24 +750,23 @@ namespace Analizador_Sintactico
                     }
                 }
                 // Verificar si el tipo de valor
-                if (Semantica(tipo, valor) == "false")
+                if (Semantica(tipo, valor,true) == "false")
                 {
+                    MessageBox.Show("Error linea: " + linea + " los tipos de datos no coinciden");
                     continue;
                 }
                 if (OPA)
                 {
-                    //Verifica si el operador es correcto
-                    if (!Array.Exists(CE, element => element == oa))
+                    if (doOPA(valor, valor2, oa, tipo) != "false")
                     {
-                        MessageBox.Show("Error linea " + linea + " operador no valido");
+                        resultado = int.Parse(doOPA(valor, valor2, oa, tipo));
+                    }
+                    else
+                    {
+                        OPA = false;
                         continue;
                     }
-                    if (!Array.Exists(CE, element => element == oa))
-                    {
-                        MessageBox.Show("Error linea " + linea + " caracter especial no valido");
-                        continue;
-                    }
-                    OPA = false;
+                    
                 }
                 bool isValid = true;
                 //Revisa si hay identificadores iguales
@@ -404,10 +785,20 @@ namespace Analizador_Sintactico
                 // La instrucción es válida, se puede asignar el valor a la variable
                 if (isValid)
                 {
-                    dtgVariables.Rows.Add(tipo, variable, valor);
+                    if (OPA)
+                    {
+                        dtgVariables.Rows.Add(tipo, variable, resultado);
+                    }
+                    else
+                    {
+                        dtgVariables.Rows.Add(tipo, variable, valor);
+                    }
                     isValid = true;
+                    OPA = false;
+                    
                 }
             }
+            terPas = 0;
             MessageBox.Show("Se completo el analisis semantico");
             linea = 0;
         }
@@ -422,6 +813,65 @@ namespace Analizador_Sintactico
                 richTextBox1.AppendText((line + 1).ToString() + Environment.NewLine); // +2 porque los índices empiezan en cero
             }
         }
+        private string doOPA(string valor, string valor2, string oa, string tipo)
+        {
+            var resultado = 0;
+            if (CheckVar(valor, "CONT") != "false")
+            {
+                valor = CheckVar(valor, "CONT");
+            }
+            if (CheckVar(valor2, "CONT") != "false")
+            {
+                valor2 = CheckVar(valor2, "CONT");
+            }
+            //Verifica si el operador es correcto
+            if (!Array.Exists(CE, element => element == oa))
+            {
+                MessageBox.Show("Error linea " + linea + " operador no valido");
+                return "false";
+            }
+            if (Semantica(tipo, valor2, true) == "false" || tipo == "string" || tipo == "bool" || tipo == "char")
+            {
+                MessageBox.Show("Error linea " + linea + " operacion aritmetica no permitida");
+                return "false";
+            }
+            switch (oa)
+            {
+                case "+":
+                    resultado = int.Parse(valor) + int.Parse(valor2);
+                    return resultado.ToString();
+                case "-":
+                    resultado = int.Parse(valor) - int.Parse(valor2);
+                    return resultado.ToString();
+                case "*":
+                    resultado = int.Parse(valor) * int.Parse(valor2);
+                    return resultado.ToString();
+                case "/":
+                    resultado = int.Parse(valor) / int.Parse(valor2);
+                    return resultado.ToString();
+                case "^":
+                    resultado = (int)Math.Pow(int.Parse(valor), int.Parse(valor2));
+                    return resultado.ToString();
+                default:
+                    MessageBox.Show("Error linea " + linea + " operador no valido");
+                    return "false";
+            }
+        }
 
+        private void btnAbrir_Click(object sender, EventArgs e)
+        {
+            // Mostrar el diálogo de selección de archivo
+            OpenFileDialog dialogo = new OpenFileDialog();
+            dialogo.Filter = "Archivos de texto (*.txt)|*.txt|Todos los archivos (*.*)|*.*";
+            dialogo.Title = "Seleccionar archivo de texto";
+            if (dialogo.ShowDialog() != DialogResult.OK)
+                return;
+
+            // Leer el contenido del archivo seleccionado
+            string contenido = File.ReadAllText(dialogo.FileName);
+
+            // Escribir el contenido en el RichTextBox
+            rtxtCodigo.Text = contenido;
+        }
     }
 }
