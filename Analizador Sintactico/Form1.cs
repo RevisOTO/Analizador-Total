@@ -52,6 +52,7 @@ namespace Analizador_Sintactico
             PalabrasReservadas.Add(new Tuple<string, string>("/", "OPER3"));
             PalabrasReservadas.Add(new Tuple<string, string>("*", "OPER4"));
             PalabrasReservadas.Add(new Tuple<string, string>("^", "OPER5"));
+            PalabrasReservadas.Add(new Tuple<string, string>("%", "OPER6"));
 
             //Operadores Relacionales
             PalabrasReservadas.Add(new Tuple<string, string>(">", "COMP1"));
@@ -82,7 +83,7 @@ namespace Analizador_Sintactico
         }
         int linea;
         String[] type = { "int", "string", "bool", "char", "double" };
-        String[] CE = { "+", "-", "/", "*", "^", "(", "=" };
+        String[] CE = { "+", "-", "/", "*", "^", "(", "=", "%" };
         String[] COMP = { "==", ">", "<", "<>", "<=", ">=" };
         String[] LOG = { "||", "&&" };
         String[] ANI = { "if", "for", "do", "while", "else" };
@@ -105,8 +106,9 @@ namespace Analizador_Sintactico
             int ide = 0;
             string PR = "";
             int countWord = -1;
-            foreach (var line in rtxtCodigo.Lines)
+            foreach (var lineb in rtxtCodigo.Lines)
             {
+                string line = lineb.Trim();
                 if (line == "")
                 {
                     continue;
@@ -423,8 +425,9 @@ namespace Analizador_Sintactico
             //Analizador Sintactico
             Sintactico();
 
-            foreach (string input in rtxtCodigo.Lines)
+            foreach (string inputb in rtxtCodigo.Lines)
             {
+                string input = inputb.Trim();
                 linea++;
                 if (input == "" || input[0] == '/')
                 {
@@ -489,9 +492,9 @@ namespace Analizador_Sintactico
 
                             // Convertir el subconjunto en un nuevo array y unir sus elementos en una cadena
                             string operacionLogica = string.Join(" ", segmento.ToArray());
-
-                            operacionLogica = AnalizarOperacionLogica(operacionLogica);
                             rtxtPostfijo.AppendText(InfijoAPostfijo(operacionLogica) + "\n");
+                            operacionLogica = AnalizarOperacionLogica(operacionLogica);
+                            
                             continue;
                         }
                         else
@@ -518,9 +521,9 @@ namespace Analizador_Sintactico
 
                             // Convertir el subconjunto en un nuevo array y unir sus elementos en una cadena
                             string operacionLogica = string.Join(" ", segmento.ToArray());
-
-                            operacionLogica = AnalizarOperacionLogica(operacionLogica);
                             rtxtPostfijo.AppendText(InfijoAPostfijo(operacionLogica) + "\n");
+                            operacionLogica = AnalizarOperacionLogica(operacionLogica);
+                            
                             continue;
                         }
                         else
@@ -677,6 +680,7 @@ namespace Analizador_Sintactico
 
                 if (tokens[0] == "println")
                 {
+                    rtxtPostfijo.AppendText(input+"\n");
                     continue;
                 }
                 else if (tokens[0] == "readline")
@@ -789,46 +793,80 @@ namespace Analizador_Sintactico
             linea = 0;
 
         }
+        private string WriteLnFormat(string inputString)
+        {
+
+            // Dividir la cadena en palabras
+            string[] words = inputString.Split(' ');
+
+            // Verificar que hay al menos tres palabras en la cadena
+            // Crear una lista para almacenar las palabras desde la tercera hasta la penúltima
+            List<string> selectedWords = new List<string>();
+
+            // Iterar desde la tercera palabra hasta la penúltima
+            for (int i = 2; i < words.Length - 1; i++)
+            {
+                selectedWords.Add(words[i]);
+            }
+
+            // Unir las palabras seleccionadas en una nueva cadena
+            string outputString = string.Join(" ", selectedWords);
+
+            // Imprimir la cadena resultante
+            return outputString;
+        }
+
+
         private void Cuadruplos()
         {
             dtgvCuadruplos.Rows.Clear();
             string lastWord = "";
             bool alredyCuad = false;
             string lastlastWord = "";
+            string lastlastlastWord = "";
             int CuadId = 1;
             bool isPathFalse = false;
-            int RoutID = 0;
+            int RoutIDT = 0;
+            int RoutIDF = 0;
             foreach (string line in rtxtPostfijo.Lines)
             {
+                if (line.Split()[0] == "println") 
+                {
+                    dtgvCuadruplos.Rows.Add("", WriteLnFormat(line), "" , "println");
+                    continue;
+                }
                 if (line == "") { continue; }
-                if (line == "else") { isPathFalse = true; continue; }
-                string currentLine = line;
+                if (line == "else") { dtgvCuadruplos.Rows.Add("else", "", "", ""); isPathFalse = true; continue; }
                 int TempID = 1;
                 if (isPathFalse)
                 {
+                    
                     if (line[0] == '{')
                     {
-                        dtgvCuadruplos.Rows.Add("", $"FalseCuad{RoutID}", "", "");
+                        dtgvCuadruplos.Rows.Add("", $"FalseCuad {RoutIDF}", "", "");
                         continue;
                     }
                     if (line[0] == '}')
                     {
-                        dtgvCuadruplos.Rows.Add("", $"FalseFin{RoutID}", "", "");
+                        dtgvCuadruplos.Rows.Add("", $"FalseFin {RoutIDF}", "", "");
                         isPathFalse = false;
                         continue;
                     }
                 }
                 else
                 {
+                    
                     if (line[0] == '{')
                     {
-                        RoutID++;
-                        dtgvCuadruplos.Rows.Add("", $"TrueCuad{RoutID}", "", "");
+                        RoutIDT++;
+                        dtgvCuadruplos.Rows.Add("", $"TrueCuad {RoutIDT}", "", "");
                         continue;
                     }
                     if (line[0] == '}')
                     {
-                        dtgvCuadruplos.Rows.Add("", $"TrueFin{RoutID}", "", "");
+                        RoutIDF = RoutIDT;
+                        dtgvCuadruplos.Rows.Add("", $"TrueFin {RoutIDT}", "", "");
+                        RoutIDT--;
                         continue;
                     }
                 }
@@ -838,15 +876,15 @@ namespace Analizador_Sintactico
                 
                 if (word[0] == "if" || word[0] == "while")
                 {
-                    dtgvCuadruplos.Rows.Add(word[0], "Cuadruplo " + CuadId, "", "");
+                    dtgvCuadruplos.Rows.Add(word[0], "", "", "");
                     alredyCuad = true;
                     CuadId++;
                     continue;
                 }
                 else if (!alredyCuad)
-                {
+                {  
+                    //dtgvCuadruplos.Rows.Add("", "", "", "");
                     CuadId++;
-                    dtgvCuadruplos.Rows.Add("", "Cuadruplo " + CuadId, "", "");
                 }
                 alredyCuad = false;
                 for (int i = 0; i < word.Length; i++)
@@ -857,6 +895,10 @@ namespace Analizador_Sintactico
                     }
                     if (word[i] == "=")
                     {
+                        if (lastWord.Contains("T") || lastlastWord.Contains("T"))
+                        {
+                            continue;
+                        }
                         dtgvCuadruplos.Rows.Add(lastlastWord, lastWord,"", word[i]);
                         continue;
                     }
@@ -884,7 +926,7 @@ namespace Analizador_Sintactico
                             continue;
                         }
 
-                        dtgvCuadruplos.Rows.Add("T" + TempID, lastlastWord, lastWord, word[i]);
+                        dtgvCuadruplos.Rows.Add(lastlastlastWord, lastlastWord, lastWord, word[i]);
                         newPost = string.Join(" ", newPost.Split().Take(newPost.Split().Length - 2));
                         newPost += " T" + TempID;
                         while (i < word.Length - 1)
@@ -902,17 +944,22 @@ namespace Analizador_Sintactico
                         continue;
                     }
                     newPost += " "+ word[i];
+                    lastlastlastWord = lastlastWord;
                     lastlastWord = lastWord;
                     lastWord = word[i];
                 }
             }
             PasosAnidados();
         }
+       
+
         private void PasosAnidados()
         {
             int auxRowRoute = 0;
             int auxRowFin = 0;
             int auxWhile = 0;
+            Stack<string> pilaT = new Stack<string>();
+            Stack<string> pilaF = new Stack<string>();
             //Busca Rutas
             for (int i = 0; i < dtgvCuadruplos.RowCount-1; i++)
             {
@@ -928,20 +975,22 @@ namespace Analizador_Sintactico
                     {
                         if (dtgvCuadruplos.Rows[j].Cells[1].Value.ToString().Contains("TrueCuad"))
                         {
+                            pilaT.Push(dtgvCuadruplos.Rows[j].Cells[1].Value.ToString().Split()[1]);
                             dtgvCuadruplos.Rows[i].Cells[3].Value = dtgvCuadruplos.Rows[j].Cells[4].Value;
                             break;
                         }
                     }
                 }
                 //Ruta Falsa
-                else if (dtgvCuadruplos.Rows[i].Cells[0].Value.ToString().Contains("RouteF"))
+                else if (dtgvCuadruplos.Rows[i].Cells[0].Value.ToString().Contains("RouteF") )
                 {
                     auxRowRoute = i;
                     //Busca el true target
                     for (int j = i; j < dtgvCuadruplos.RowCount - 1; j++)
                     {
-                        if (dtgvCuadruplos.Rows[j].Cells[1].Value.ToString().Contains("TrueFin"))
+                        if (dtgvCuadruplos.Rows[j].Cells[1].Value.ToString().Contains("TrueFin") && pilaT.Peek() == dtgvCuadruplos.Rows[j].Cells[1].Value.ToString().Split()[1])
                         {
+                            pilaT.Pop();
                             auxRowFin = j;
                             dtgvCuadruplos.Rows[i].Cells[3].Value = dtgvCuadruplos.Rows[j].Cells[4].Value;
                             break;
@@ -1019,6 +1068,7 @@ namespace Analizador_Sintactico
                 { "-", 2 },
                 { "*", 3 },
                 { "/", 3 },
+                { "%", 3 },
                 { "^", 4 },
                 { "&&", 5 },
                 { "||", 5 },
@@ -1200,6 +1250,158 @@ namespace Analizador_Sintactico
 
             // Asignar el valor autoincrementable a la última columna de la nueva fila agregada
             dtgvCuadruplos.Rows[rowIndex].Cells[dtgvCuadruplos.Columns.Count - 1].Value = ++autoincrementValue;
+        }
+
+        private void TraducirCodigoXDAEnsamblador(DataGridView tabla)
+        {
+            string rutaArchivo = @"C:\Users\revis\source\repos\Analizador Sintactico\Test1.asm";
+            int msg = 0;
+            Stack<string> stackAss = new Stack<string>();
+            Stack<string> stackCuad = new Stack<string>();
+            StringWriter sw = new StringWriter();
+
+            sw.WriteLine(".MODEL small");
+            sw.WriteLine(".STACK 100h");
+            sw.WriteLine(".DATA");
+            sw.WriteLine("    newline DB 0DH, 0AH, '$'");
+            foreach (var item in ContTuple)
+            {
+                if (item.Item1.StartsWith("STR"))
+                {
+                    msg++;
+                    sw.WriteLine($"    msg{msg} DB '{item.Item2}$'");
+                }
+            }
+            foreach (var item in IDES)
+            {
+                sw.WriteLine($@"    {item.Item1} DW 0");
+            }
+            sw.WriteLine($@"    T1 DW 0");
+            sw.WriteLine(".CODE");
+            sw.WriteLine("    MOV AX, @DATA");
+            sw.WriteLine("    MOV DS, AX");
+            msg = 0;
+            // Declaración de variables
+            sw.WriteLine("    ; Declaración de variables");
+
+            foreach (DataGridViewRow row in tabla.Rows)
+            {
+                string op = "";
+                string res = "";
+                string df1 = "";
+                string df2 = "";
+                try
+                {
+                    res = row.Cells[0].Value?.ToString() ?? string.Empty;
+                    df1 = row.Cells[1].Value?.ToString() ?? string.Empty;
+                    df2 = row.Cells[2].Value?.ToString() ?? string.Empty;
+                    op = row.Cells[3].Value?.ToString() ?? string.Empty;
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+                if (df1.Contains("FalseFin") || df1.Contains("TrueFin"))
+                {
+                    if (stackAss.Peek().Contains("if"))
+                    {
+                        sw.WriteLine($"    JMP else_end");
+                        sw.WriteLine($"{stackAss.Peek()}_end:");
+                        stackAss.Pop();
+                        continue;
+                    }
+                    if (stackAss.Peek().Contains("else"))
+                    {
+                        sw.WriteLine($"{stackAss.Peek()}_end:");
+                        stackAss.Pop();
+                        continue;
+                    }
+                    sw.WriteLine($"    JMP {stackAss.Peek()}");
+                    sw.WriteLine($"{stackAss.Peek()}_end:");
+                    stackAss.Pop();
+                }
+                switch (res)
+                {
+                    case "while":
+                        sw.WriteLine("while:");
+                        stackAss.Push("while");
+                        continue;
+                    case "if":
+                        sw.WriteLine("if:");
+                        stackAss.Push("if");
+                        continue;
+                    case "else":
+                        sw.WriteLine("else:");
+                        stackAss.Push("else");
+                        continue;
+                }
+                switch (op)
+                {
+                    case "println":
+                        msg++;
+                        sw.WriteLine($"    MOV AH, 9\n    MOV DX, OFFSET msg{msg}\n    INT 21H\n\n    MOV AH, 9\n    MOV DX, OFFSET newline\n    INT 21H");
+                        break;
+
+                    case "=":
+                        sw.WriteLine($"    MOV {res},{df1}");
+                        break;
+                    case "==":
+                        sw.WriteLine($"    CMP {df1}, {df2}\n   JNE {stackAss.Peek()}_end");
+                        break;
+                    case ">=":
+                        sw.WriteLine($"    CMP {df1}, {df2}\n   JB {stackAss.Peek()}_end");
+                        break;
+                    case "<=":
+                        sw.WriteLine($"    CMP {df1}, {df2}\n   JA {stackAss.Peek()}_end");
+                        break;
+                    case "<>":
+                        sw.WriteLine($"    CMP {df1}, {df2}\n   JE {stackAss.Peek()}_end");
+                        break;
+
+                    case "+":
+                        if (res == df1 )
+                        {
+                            sw.WriteLine($"    ADD {res}, {df2}");
+                            break;
+                        }
+                        else if (res == df2)
+                        {
+                            sw.WriteLine($"    ADD {res}, {df1}");
+                            break;
+                        }
+                        sw.WriteLine($"    MOV {res},{df1}\n    ADD {res}, {df2}");
+                        break;
+                    case "-":
+                        sw.WriteLine($"    MOV {res},{df1}\n    SUB {res}, {df2}");
+                        break;
+                    case "/":
+                        sw.WriteLine($"    MOV AX,{df1}\n    MOV BX,{df2}\n    DIV BX\n    MOV {res},AX");
+                        break;
+                    case "%":
+                        sw.WriteLine($"    MOV AX,{df1}\n    MOV BX,{df2}\n    DIV BX\n    MOV {res},DX");
+                        break;
+                    case "*":
+                        sw.WriteLine($"    MOV AX,{df1}\n    MOV BX,{df2}\n    MUL BX\n    MOV {res},AX");
+                        break;
+                }
+            }
+
+            sw.WriteLine("    MOV AH, 4CH");
+            sw.WriteLine("    INT 21H");
+            sw.WriteLine(".EXIT");
+            sw.WriteLine("END");
+
+            using (StreamWriter writer = new StreamWriter(rutaArchivo))
+            {
+                writer.Write(sw.ToString());
+            }
+        }
+
+
+        private void btnAsm_Click(object sender, EventArgs e)
+        {
+            TraducirCodigoXDAEnsamblador(dtgvCuadruplos);
+            MessageBox.Show("Ya se tradujo");
         }
     }
 }

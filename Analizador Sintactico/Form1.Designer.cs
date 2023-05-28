@@ -50,19 +50,20 @@
             this.DF1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DF2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Operador = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Num = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.rtxtPostfijo = new System.Windows.Forms.RichTextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.Num = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.btnAsm = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dtgVariables)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dtgvCuadruplos)).BeginInit();
             this.SuspendLayout();
             // 
             // btnAnalizar
             // 
-            this.btnAnalizar.Location = new System.Drawing.Point(620, 754);
+            this.btnAnalizar.Location = new System.Drawing.Point(651, 771);
             this.btnAnalizar.Margin = new System.Windows.Forms.Padding(4);
             this.btnAnalizar.Name = "btnAnalizar";
-            this.btnAnalizar.Size = new System.Drawing.Size(161, 57);
+            this.btnAnalizar.Size = new System.Drawing.Size(130, 49);
             this.btnAnalizar.TabIndex = 0;
             this.btnAnalizar.Text = "Analizar";
             this.btnAnalizar.UseVisualStyleBackColor = true;
@@ -222,9 +223,9 @@
             this.DF2,
             this.Operador,
             this.Num});
-            this.dtgvCuadruplos.Location = new System.Drawing.Point(884, 499);
+            this.dtgvCuadruplos.Location = new System.Drawing.Point(787, 499);
             this.dtgvCuadruplos.Name = "dtgvCuadruplos";
-            this.dtgvCuadruplos.Size = new System.Drawing.Size(583, 276);
+            this.dtgvCuadruplos.Size = new System.Drawing.Size(733, 265);
             this.dtgvCuadruplos.TabIndex = 14;
             this.dtgvCuadruplos.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dtgvCuadruplos_RowsAdded);
             // 
@@ -252,11 +253,17 @@
             this.Operador.Name = "Operador";
             this.Operador.ReadOnly = true;
             // 
+            // Num
+            // 
+            this.Num.HeaderText = "Num";
+            this.Num.Name = "Num";
+            this.Num.ReadOnly = true;
+            // 
             // rtxtPostfijo
             // 
             this.rtxtPostfijo.Location = new System.Drawing.Point(12, 499);
             this.rtxtPostfijo.Name = "rtxtPostfijo";
-            this.rtxtPostfijo.Size = new System.Drawing.Size(769, 233);
+            this.rtxtPostfijo.Size = new System.Drawing.Size(769, 265);
             this.rtxtPostfijo.TabIndex = 15;
             this.rtxtPostfijo.Text = "";
             // 
@@ -269,11 +276,16 @@
             this.label1.TabIndex = 16;
             this.label1.Text = "Postfijo Tokens";
             // 
-            // Num
+            // btnAsm
             // 
-            this.Num.HeaderText = "Num";
-            this.Num.Name = "Num";
-            this.Num.ReadOnly = true;
+            this.btnAsm.Location = new System.Drawing.Point(787, 772);
+            this.btnAsm.Margin = new System.Windows.Forms.Padding(4);
+            this.btnAsm.Name = "btnAsm";
+            this.btnAsm.Size = new System.Drawing.Size(130, 49);
+            this.btnAsm.TabIndex = 18;
+            this.btnAsm.Text = "Ensamblador";
+            this.btnAsm.UseVisualStyleBackColor = true;
+            this.btnAsm.Click += new System.EventHandler(this.btnAsm_Click);
             // 
             // Form1
             // 
@@ -281,6 +293,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1552, 833);
             this.Controls.Add(this.dtgvCuadruplos);
+            this.Controls.Add(this.btnAsm);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.rtxtPostfijo);
             this.Controls.Add(this.btnAbrir);
@@ -335,6 +348,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn DF2;
         private System.Windows.Forms.DataGridViewTextBoxColumn Operador;
         private System.Windows.Forms.DataGridViewTextBoxColumn Num;
+        private System.Windows.Forms.Button btnAsm;
     }
 }
 
