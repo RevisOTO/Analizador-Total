@@ -835,6 +835,10 @@ namespace Analizador_Sintactico
                     dtgvCuadruplos.Rows.Add("", WriteLnFormat(line), "" , "println");
                     continue;
                 }
+                if (line.Split()[0] == "string")
+                {
+                    dtgvCuadruplos.Rows.Add(line.Split()[1], line.Split()[3], "", "=");
+                }
                 if (line == "") { continue; }
                 if (line == "else") { dtgvCuadruplos.Rows.Add("else", "", "", ""); isPathFalse = true; continue; }
                 int TempID = 1;

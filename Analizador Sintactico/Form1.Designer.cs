@@ -54,6 +54,7 @@
             this.rtxtPostfijo = new System.Windows.Forms.RichTextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.btnAsm = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dtgVariables)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dtgvCuadruplos)).BeginInit();
             this.SuspendLayout();
@@ -287,11 +288,21 @@
             this.btnAsm.UseVisualStyleBackColor = true;
             this.btnAsm.Click += new System.EventHandler(this.btnAsm_Click);
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(1139, 473);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(86, 16);
+            this.label7.TabIndex = 19;
+            this.label7.Text = "Cuadruplos";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1552, 833);
+            this.Controls.Add(this.label7);
             this.Controls.Add(this.dtgvCuadruplos);
             this.Controls.Add(this.btnAsm);
             this.Controls.Add(this.label1);
@@ -349,6 +360,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Operador;
         private System.Windows.Forms.DataGridViewTextBoxColumn Num;
         private System.Windows.Forms.Button btnAsm;
+        private System.Windows.Forms.Label label7;
     }
 }
 
